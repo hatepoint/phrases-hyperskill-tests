@@ -26,3 +26,5 @@ files:
   visible: false
 - name: src/test/java/org/hyperskill/phrases/internals/AbstractUnitTest.kt
   visible: false
+- name: src/test/java/org/hyperskill/phrases/internals/PhrasesUnitTest.kt
+  visible: false

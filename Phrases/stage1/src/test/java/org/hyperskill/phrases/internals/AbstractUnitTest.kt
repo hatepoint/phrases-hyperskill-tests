@@ -2,9 +2,13 @@ package org.hyperskill.phrases.internals
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import org.junit.Assert.*
 import org.robolectric.Robolectric
 import org.robolectric.Shadows.shadowOf
@@ -163,5 +167,98 @@ abstract class AbstractUnitTest<T : Activity>(clazz: Class<T>) {
         )
 
         return latestAlertDialog!!
+    }
+
+    /**
+     *  Makes assertions on the contents of the RecyclerView.
+     *
+     *  Asserts that the size matches the size of fakeResultList and then
+     *  calls assertItems for each item of the list with the itemViewSupplier
+     *  so that it is possible to make assertions on that itemView.
+     *
+     *  Take attention to refresh references to views coming from itemView since RecyclerView
+     *  can change the instance of View for a determinate list item after an update of the list
+     *  (ex: calling notifyItemChanged and similar methods).
+     */
+    fun <T> RecyclerView.assertListItems(
+        fakeResultList: List<T>,
+        assertItems: (itemViewSupplier: () -> View, position: Int, item: T) -> Unit
+    ) : Unit {
+
+        assertNotNull("Your recycler view adapter should not be null", this.adapter)
+
+        val expectedSize = fakeResultList.size
+
+        val actualSize = this.adapter!!.itemCount
+        assertEquals("Incorrect number of list items", expectedSize, actualSize)
+
+        if(expectedSize == 0) {
+            return
+        } else if(expectedSize > 0) {
+            val firstItemViewHolder = (0 until expectedSize)
+                .asSequence()
+                .mapNotNull {  this.findViewHolderForAdapterPosition(it) }
+                .firstOrNull()
+                ?: throw AssertionError("No item is being displayed on songList RecyclerView, is it big enough to display one item?")
+
+            val listHeight = firstItemViewHolder.itemView.height * (expectedSize + 1)
+
+            for((i, song) in fakeResultList.withIndex()) {
+                // setting height to ensure that all items are inflated. Height might change after assertItems, keep statement inside loop.
+                this.layout(0,0, this.width, listHeight)  // may increase clock time
+
+                val itemViewSupplier = {
+                    scrollToPosition(i)
+                    findViewHolderForAdapterPosition(i)?.itemView
+                        ?: throw AssertionError("Could not find list item with index $i")
+                }
+                assertItems(itemViewSupplier, i, song)
+            }
+
+        } else {
+            throw IllegalStateException("size assertion was not effective")
+        }
+    }
+
+
+    /**
+     * Use this class to get a testing database.
+     *
+     * example use-cases:
+     * TestDatabaseFactory().writableDatabase.use {...}, for setting up a state before launching
+     * the activity to test restoring of existing data by this activity.
+     *
+     * TestDatabaseFactory().readableDatabase.use {...}, for testing if data is is being saved
+     *
+     */
+    inner class TestDatabaseFactory(
+        context: Context? = activity,
+        name: String? = "phrasesDatabase.db",
+        factory: SQLiteDatabase.CursorFactory? = null,
+        version: Int = 1
+    ) : SQLiteOpenHelper(context, name, factory, version) {
+        var onCreateCalled = false
+        var onUpgradeCalled = false
+        var onOpenCalled = false
+
+        override fun onCreate(database: SQLiteDatabase) {
+            onCreateCalled = true
+        }
+
+        override fun onUpgrade(database: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+            onUpgradeCalled = true
+        }
+
+        override fun onOpen(database: SQLiteDatabase) {
+            onOpenCalled = true
+        }
+
+        @Synchronized
+        override fun close() {
+            onCreateCalled = false
+            onUpgradeCalled = false
+            onOpenCalled = false
+            super.close()
+        }
     }
 }
