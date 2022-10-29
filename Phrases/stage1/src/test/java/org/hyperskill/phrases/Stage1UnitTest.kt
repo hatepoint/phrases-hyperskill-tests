@@ -1,11 +1,11 @@
-package org.hyperskill.projectname
+package org.hyperskill.phrases
 
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
-import org.hyperskill.projectname.internals.AbstractUnitTest
+import org.hyperskill.phrases.internals.AbstractUnitTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

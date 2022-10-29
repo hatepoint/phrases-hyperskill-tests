@@ -1,4 +1,4 @@
-package org.hyperskill.projectname
+package org.hyperskill.phrases
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

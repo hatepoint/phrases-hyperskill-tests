@@ -1,4 +1,4 @@
-package org.hyperskill.projectname.internals
+package org.hyperskill.phrases.internals
 
 import android.app.Activity
 import android.app.AlertDialog
