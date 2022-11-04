@@ -1,9 +1,6 @@
 package org.hyperskill.phrases
 
 import org.hyperskill.phrases.internals.PhrasesUnitTest
-import org.hyperskill.phrases.ui.MainActivity
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -18,12 +15,6 @@ class Stage2UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java){
         }
     }
 
-    @Before
-    fun setDB(){
-        addToRoomDatabase()
-        //resetRoomDatabase()
-    }
-
     @Test
     fun checkRecyclerView() {
         testActivity {
@@ -32,11 +23,6 @@ class Stage2UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java){
             recyclerViewCheckAmount
             recyclerViewClick
         }
-    }
-
-    @After
-    fun cleanUp() {
-        killRoomInstance()
     }
 
     @Test

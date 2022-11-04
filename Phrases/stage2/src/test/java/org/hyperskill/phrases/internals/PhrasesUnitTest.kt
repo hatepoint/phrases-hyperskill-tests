@@ -6,12 +6,9 @@ import android.content.Context
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import org.hyperskill.phrases.data.room.AppDatabase
-import org.hyperskill.phrases.data.room.entity.Phrase
 import org.junit.Assert.*
 import org.robolectric.Shadows
 import org.robolectric.shadows.ShadowNotificationManager
-import kotlin.reflect.KProperty
 
 
 open class PhrasesUnitTest<T : Activity>(clazz: Class<T>): AbstractUnitTest<T>(clazz) {
@@ -70,26 +67,6 @@ open class PhrasesUnitTest<T : Activity>(clazz: Class<T>): AbstractUnitTest<T>(c
         view.findViewByString<TextView>("deleteTextView").clickAndRun()
         assertEquals("The recyclerView didn't remove item after clicking 'Delete'.", expectedAmount, view.adapter!!.itemCount)
         view
-    }
-
-    fun addToRoomDatabase(amount: Int = 3) {
-        val db = AppDatabase.getInstance(activity)
-        val dao = db.phraseDao()
-        for (i in 1..amount) {
-            dao.insert(Phrase(0,"This is a test phrase #$i"))
-        }
-        killRoomInstance()
-    }
-
-    fun resetRoomDatabase() {
-        val db = AppDatabase.getInstance(activity)
-        db.clearAllTables()
-    }
-
-    fun killRoomInstance() {
-        val field = AppDatabase::class.java.getDeclaredField("INSTANCE")
-        field.isAccessible = true
-        field.set(null, null)
     }
 
     //  .... common recurring assertions, util functions, other views
