@@ -1,52 +1,26 @@
 <html>
 
-<h2>Task Description: Tips & Tricks</h2>
+<h2>Description</h2>
 
-<p>This is a task description file.
-    Its content will be displayed to a learner
-    in the <strong>Task Description</strong> window.</p>
+<p>In case you would like to have some motivation boost in mornings, you can create an app which sends you some random phrases! In this stage, you will design an UI for this application. There will be a list of phrases, a button to add more, and a text with reminder time.</p>
 
-<p>It supports both Markdown and HTML.
-    To toggle the format, you can rename <strong>task.md</strong>
-    to <strong>task.html</strong>, or vice versa.
-    The default task description format can be changed
-    in <strong>Preferences | Tools | Education</strong>,
-    but this will not affect any existing task description files.</p>
+<h2>Objectives</h2>
 
-<p>The following features are available in
-    <strong>task.md/task.html</strong>
-    which are specific to the EduTools plugin:</p>
+<p>Create a screen which contains the following components:</p>
 
-<ul>
-    <li>Hints can be added anywhere in the task text.
-        Type "hint" and press Tab.
-        Hints should be added to an empty line in the task text.
-        In hints you can use both HTML and Markdown.
-        <div class="hint">Text of your hint</div></li>
+<ol>
+    <li>A <code>TextView</code> that shows whether the reminder is set, and if it is, at what time</li>
+    <li>A <code>RecyclerView</code> that will hold your phrases</li>
+    <li>A Floating Action Button which allows you to add more phrases</li>
+</ol>
 
-    <li>You may need to refer your learners to a particular lesson,
-        task, or file. To achieve this, you can use the in-course links.
-        Specify the path using the <code>&lt;a href="course://lesson1/task1/file1"&gt;
-            link_text&lt;/a&gt;</code> format.</li><br>
+<p>Set these ID&#39;s for your widgets: TextView: <code>reminderTextView</code>, RecyclerView: <code>recyclerView</code>, Floating Action Button: <code>addButton</code>.</p>
 
-    <li>You can insert shortcuts in the task description.
-        While <strong>task.html/task.md</strong> is open,
-        right-click anywhere on the <strong>Editor</strong> tab
-        and choose the <strong>Insert shortcut</strong> option
-        from the context menu.
-        For example: &amp;shortcut:FileStructurePopup;.</li><br>
+<p><code>reminderTextView</code> text attribute should be set to &quot;No reminder set&quot;.</p>
 
-    <li>Insert the &percnt;<code>IDE_NAME</code>&percnt; macro,
-        which will be replaced by the actual IDE name.
-        For example, <strong>%IDE_NAME%</strong>.</li><br>
+<h2>Examples</h2>
 
-    <li>Insert PSI elements, by using links like
-        <code>&lt;a href="psi_element://link.to.element"&gt;element description&lt;/a&gt;</code>.
-        To get such a link, right-click the class or method
-        and select <strong>Copy Reference</strong>.
-        Then press &amp;shortcut:EditorPaste;
-        to insert the link where appropriate.
-        For example, a
-        <a href="psi_element://java.lang.String#contains">link to the "contains" method</a>.</li>
-</ul>
+<p><strong>Example 1:</strong> <em>An example of your program</em></p>
+
+<p><img alt="" height="672" name="Screenshot_1666295186.png" src="https://ucarecdn.com/358de169-e57c-4d2f-a68f-0392140c46ed/" width="310" /></p>
 </html>
