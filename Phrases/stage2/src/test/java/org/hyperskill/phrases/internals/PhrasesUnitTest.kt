@@ -42,31 +42,28 @@ open class PhrasesUnitTest<T : Activity>(clazz: Class<T>): AbstractUnitTest<T>(c
         )
     }
 
-    protected val recyclerViewItems: RecyclerView by lazy {
-        val view = activity.findViewByString<RecyclerView>("recyclerView")
-        assertNotNull("The recyclerView adapter should not be null", view)
-        val phraseTV = view.findViewByString<TextView>("phraseTextView")
-        val deleteTV = view.findViewByString<TextView>("deleteTextView")
-        view
+    protected fun recyclerViewItems(index: Int = 0) {
+        recyclerView.assertSingleListItem(index) { itemViewSupplier ->
+            val itemView = itemViewSupplier()
+            var phraseTV = itemView.findViewByString<TextView>("phraseTextView")
+            var deleteTV = itemView.findViewByString<TextView>("phraseTextView")
+        }
     }
 
-    protected val recyclerViewCheckAmount: RecyclerView by lazy {
+    protected fun recyclerViewCheckAmount() {
         val view = activity.findViewByString<RecyclerView>("recyclerView")
-        assertNotNull("The recyclerView adapter should not be null", view)
         val expectedInitialItems = 3
         val actualInitialItems = view.adapter!!.itemCount
         val messageInitialText = "The recyclerView doesn't have 3 or more items. Found $actualInitialItems items."
         assertTrue(messageInitialText, (actualInitialItems >= expectedInitialItems))
-        view
     }
 
-    protected val recyclerViewClick: RecyclerView by lazy {
+    protected fun recyclerViewClick() {
         val view: RecyclerView = activity.findViewByString("recyclerView")
         val actualAmount = view.adapter!!.itemCount
         val expectedAmount = actualAmount - 1
         view.findViewByString<TextView>("deleteTextView").clickAndRun()
         assertEquals("The recyclerView didn't remove item after clicking 'Delete'.", expectedAmount, view.adapter!!.itemCount)
-        view
     }
 
     //  .... common recurring assertions, util functions, other views

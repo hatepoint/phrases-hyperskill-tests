@@ -28,3 +28,7 @@ files:
   visible: false
 - name: src/main/java/org/hyperskill/phrases/MainActivity.kt
   visible: true
+- name: src/main/java/org/hyperskill/phrases/PhrasesAdapter.kt
+  visible: true
+- name: src/main/java/org/hyperskill/phrases/Phrase.kt
+  visible: true

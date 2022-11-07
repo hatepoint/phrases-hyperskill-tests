@@ -19,9 +19,9 @@ class Stage2UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java){
     fun checkRecyclerView() {
         testActivity {
             recyclerView
-            recyclerViewItems
-            recyclerViewCheckAmount
-            recyclerViewClick
+            recyclerViewItems()
+            recyclerViewCheckAmount()
+            recyclerViewClick()
         }
     }
 
