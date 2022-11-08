@@ -32,3 +32,5 @@ files:
   visible: true
 - name: src/main/java/org/hyperskill/phrases/Phrase.kt
   visible: true
+- name: src/main/res/layout/item_phrase.xml
+  visible: true

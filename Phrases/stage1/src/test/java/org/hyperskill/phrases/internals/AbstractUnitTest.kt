@@ -261,4 +261,50 @@ abstract class AbstractUnitTest<T : Activity>(clazz: Class<T>) {
             super.close()
         }
     }
+
+    /**
+     *  Makes assertions on the contents of one item of the RecyclerView.
+     *
+     *  Asserts that the the size of the list is at least itemIndex + 1.
+     *
+     *  Calls assertItem with the itemViewSupplier so that it is possible to make assertions on that itemView.
+     *  Take attention to refresh references to views coming from itemView since RecyclerView
+     *  can change the instance of View for a determinate list item after an update to the list.
+     */
+    fun RecyclerView.assertSingleListItem(itemIndex: Int, assertItem: (itemViewSupplier: () -> View) -> Unit) {
+
+        assertNotNull("Your recycler view adapter should not be null", this.adapter)
+
+        val expectedMinSize = itemIndex + 1
+
+        val actualSize = this.adapter!!.itemCount
+        assertTrue(
+            "RecyclerView was expected to contain item with index $itemIndex, but its size was $actualSize",
+            actualSize >= expectedMinSize
+        )
+
+        if(actualSize >= expectedMinSize) {
+            val firstItemViewHolder = (0 until actualSize)
+                .asSequence()
+                .mapNotNull {  this.findViewHolderForAdapterPosition(it) }
+                .firstOrNull()
+                ?: throw AssertionError("No item is being displayed on songList RecyclerView, is it big enough to display one item?")
+
+            val listHeight = firstItemViewHolder.itemView.height * (expectedMinSize + 1)
+            this.layout(0,0, this.width, listHeight)  // may increase clock time
+
+            val itemViewSupplier = {
+                this.scrollToPosition(itemIndex)
+                val itemView = (this.findViewHolderForAdapterPosition(itemIndex)?.itemView
+                    ?: throw AssertionError("Could not find list item with index $itemIndex"))
+                itemView
+
+            }
+
+            assertItem(itemViewSupplier)
+
+        } else {
+            throw IllegalStateException("size assertion was not effective")
+        }
+    }
 }
