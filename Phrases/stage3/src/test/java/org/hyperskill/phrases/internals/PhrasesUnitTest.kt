@@ -127,6 +127,7 @@ open class PhrasesUnitTest<T : Activity>(clazz: Class<T>): AbstractUnitTest<T>(c
                         null,
                         Handler(activity.mainLooper)
                     )
+                    shadowLooper.idleFor(500, TimeUnit.MILLISECONDS)
                 }
             } else if(it.onAlarmListener != null) {
                 if(it.triggerAtTime < SystemClock.currentGnssTimeClock().millis()) {
@@ -134,5 +135,6 @@ open class PhrasesUnitTest<T : Activity>(clazz: Class<T>): AbstractUnitTest<T>(c
                 }
             }
         }
+
     }
 }
