@@ -75,7 +75,7 @@ class Stage3UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java){
             assertEquals(messageChannelId, CHANNEL_ID, actualChannelId)
 
             val messageTitle = "Have you set correct notification title?"
-            val expectedTitle = "Phrases"
+            val expectedTitle = "Your phrase of the day"
             val actualTitle = notification.extras.getCharSequence(EXTRA_TITLE)?.toString()
             assertEquals(messageTitle, expectedTitle, actualTitle)
 
