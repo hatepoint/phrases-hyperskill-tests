@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), OnTimeSetListener {
         }
     }
 
-    /*@RequiresApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun scheduleNotification(hour: Int, minute: Int) {
         val calendar = Calendar.getInstance()
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(
@@ -63,24 +63,24 @@ class MainActivity : AppCompatActivity(), OnTimeSetListener {
         val pendingIntent = PendingIntent.getBroadcast(application.applicationContext, NOTIFICATION_ID, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val alarmManager = application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-    }*/
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun scheduleNotification(context: Context, hour: Int, minute: Int) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-        val builder = android.app.Notification.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Phrases")
-            .setContentText(phrases.random().toString())
-            .setStyle(android.app.Notification.BigTextStyle())
-            .setAutoCancel(true)
-
-        notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    private fun scheduleNotification(context: Context, hour: Int, minute: Int) {
+//        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+//        val builder = android.app.Notification.Builder(context, CHANNEL_ID)
+//            .setSmallIcon(R.drawable.ic_launcher_foreground)
+//            .setContentTitle("Phrases")
+//            .setContentText(phrases.random().toString())
+//            .setStyle(android.app.Notification.BigTextStyle())
+//            .setAutoCancel(true)
+//
+//        notificationManager.notify(NOTIFICATION_ID, builder.build())
+//    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onTimeSet(view: TimePicker?, hour: Int, minute: Int) {
-        scheduleNotification(applicationContext, hour, minute)
+        scheduleNotification(hour, minute)
         binding.reminderTextView.text = "Reminder set for $hour:$minute"
     }
 }

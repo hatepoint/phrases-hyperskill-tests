@@ -2,24 +2,27 @@ package org.hyperskill.phrases
 
 import android.app.Notification.EXTRA_TEXT
 import android.app.Notification.EXTRA_TITLE
-import android.app.NotificationManager
+import android.os.SystemClock
 import org.hyperskill.phrases.internals.PhrasesUnitTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Before
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.robolectric.RobolectricTestRunner
-import org.junit.Assert.*
-import java.time.Duration
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(RobolectricTestRunner::class)
 class Stage3UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java){
 
-    init {
-        notificationManager.setNotificationsEnabled(true)
-        notificationManager.setNotificationPolicyAccessGranted(true)
+
+    @Before
+    fun setUp() {
+        SystemClock.setCurrentTimeMillis(System.currentTimeMillis())
     }
 
     @Test
@@ -42,17 +45,21 @@ class Stage3UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java){
             assertEquals("The reminderTextView has a wrong text", expectedTimeText, actualTimeText)
         }
     }
-    //TODO Fix this test for working with Broadcast Receiver
+
     @Test
     fun test02_checkNotificationIsSent() {
         testActivity {
+            val minutesToAdd = 10
             val calendar = Calendar.getInstance()
-            val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
-            val currentMinute = calendar.get(Calendar.MINUTE)
+            calendar.add(Calendar.MINUTE, minutesToAdd)
+            val pickHour = calendar.get(Calendar.HOUR_OF_DAY)
+            val pickMinute = calendar.get(Calendar.MINUTE)
 
             reminderTv.clickAndRun()
             val timePickerDialog = getLatestTimePickerDialog()
-            timePickerDialog.pickTime(currentHour, currentMinute - 1)
+
+            timePickerDialog.pickTime(pickHour, pickMinute)
+            shadowLooper.idleFor(minutesToAdd + 2L, TimeUnit.MINUTES) // trigger alarm
 
             supportForAlarmManager()
 
@@ -79,7 +86,4 @@ class Stage3UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java){
             notification.contentIntent
         }
     }
-
-
-
 }
