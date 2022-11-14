@@ -4,18 +4,16 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteException
 import android.os.Handler
 import android.os.SystemClock
-import android.view.View
 import android.widget.TextView
 import androidx.core.content.getSystemService
-import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.RoomDatabase
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import org.hyperskill.phrases.TimePickerDialog
-import org.hyperskill.phrases.data.room.AppDatabase
-import org.hyperskill.phrases.data.room.entity.Phrase
 import org.junit.Assert.*
 import org.robolectric.Shadows
 import org.robolectric.Shadows.shadowOf
@@ -30,6 +28,7 @@ open class PhrasesUnitTest<T : Activity>(clazz: Class<T>): AbstractUnitTest<T>(c
     companion object {
         const val CHANNEL_ID = "org.hyperskill.phrases"
         const val NOTIFICATION_ID = 393939
+        val fakePhrases = listOf("This is a test phrase", "This is another test phrase", "Yet another test phrase")
     }
 
     protected val reminderTv: TextView by lazy {
@@ -141,28 +140,72 @@ open class PhrasesUnitTest<T : Activity>(clazz: Class<T>): AbstractUnitTest<T>(c
         }
     }
 
-    protected fun addToRoomDatabase(amount: Int = 3) {
-        val db = AppDatabase.getInstance(activity)
-        val dao = db.getPhraseDao()
-        for (i in 1..amount) {
-            dao.insert(Phrase(0,"This is a test phrase #$i"))
+    protected fun addToDatabase(phrases: List<String>) {
+
+        TestDatabaseFactory().writableDatabase.use { database ->
+            database.execSQL("CREATE TABLE IF NOT EXISTS phrases (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, phrase TEXT NOT NULL)")
+            database.beginTransaction()
+            try {
+                phrases.forEach {
+                    ContentValues().apply {
+                        put("phrase", it)
+                        database.insert("phrases", null, this)
+                    }
+                }
+                database.setTransactionSuccessful()
+            } catch (ex: SQLiteException) {
+                ex.printStackTrace()
+                fail(ex.stackTraceToString())
+            } catch (ex: IllegalStateException) {
+                ex.printStackTrace()
+                fail(ex.stackTraceToString())
+            } finally {
+                database.endTransaction()
+            }
         }
-        killRoomInstance()
     }
 
-    protected fun resetRoomDatabase() {
-        val db = AppDatabase.getInstance(activity)
-        db.clearAllTables()
+    protected fun readAllFromDatabase(): List<String> {
+
+        val phrasesFromDb = mutableListOf<String>()
+
+        TestDatabaseFactory().readableDatabase.use { database ->
+            database.query("phrases", null,
+                null, null, null, null, null).use { cursor ->
+
+                val phraseColumnIndex = cursor.getColumnIndex("phrase")
+                assertTrue("phrase column was not found", phraseColumnIndex >= 0)
+
+                while(cursor.moveToNext()) {
+                    val phrase = cursor.getString(phraseColumnIndex)
+                    phrasesFromDb.add(phrase)
+                }
+            }
+        }
+
+        return phrasesFromDb
     }
 
-    protected fun killRoomInstance() {
-        val field = AppDatabase::class.java.getDeclaredField("INSTANCE")
-        field.isAccessible = true
-        field.set(null, null)
-    }
+    fun closeRoom() {
+        val clazzName = "org.hyperskill.phrases.data.room.AppDatabase"
+        val clazz: Class<*> = try {
+            Class.forName(clazzName)
+        } catch (e: ClassNotFoundException ) {
+            throw AssertionError("Could not find on solution a class $clazzName")
+        }
 
-    protected fun DialogFragment.findViewByString(id: String): View {
-        val view = this.view ?: throw AssertionError("Could not find a view with ID $id on DialogFragment")
-        return view.findViewByString(id)
+        val instanceField = try {
+            clazz.getDeclaredField("INSTANCE")
+        } catch (e: NoSuchFieldException) {
+            throw AssertionError("Could not find on $clazzName a field named INSTANCE")
+        }
+
+        instanceField.isAccessible = true
+        val instanceAsAny: Any = instanceField.get(clazz) ?: return
+
+        assertTrue("AppDatabase.INSTANCE should be a RoomDatabase", instanceAsAny is RoomDatabase)
+        val roomInstance = instanceAsAny as RoomDatabase
+        roomInstance.close()
+        instanceField.set(null, null)
     }
 }

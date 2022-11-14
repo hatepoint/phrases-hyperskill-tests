@@ -2,6 +2,7 @@ package org.hyperskill.phrases.internals
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
@@ -233,7 +234,7 @@ abstract class AbstractUnitTest<T : Activity>(clazz: Class<T>) {
      */
     inner class TestDatabaseFactory(
         context: Context? = activity,
-        name: String? = "phrasesDatabase.db",
+        name: String? = "phrases.db",
         factory: SQLiteDatabase.CursorFactory? = null,
         version: Int = 1
     ) : SQLiteOpenHelper(context, name, factory, version) {
@@ -306,5 +307,24 @@ abstract class AbstractUnitTest<T : Activity>(clazz: Class<T>) {
         } else {
             throw IllegalStateException("size assertion was not effective")
         }
+    }
+
+    /**
+     * Use this method to find views.
+     *
+     * The view existence will be assert before being returned
+     */
+    inline fun <reified T> Dialog.findViewByString(idString: String): T {
+        val id = this.context.resources.getIdentifier(idString, "id", context.packageName)
+        val view: View? = this.findViewById(id)
+
+        val idNotFoundMessage = "View with id \"$idString\" was not found"
+        val wrongClassMessage = "View with id \"$idString\" is not from expected class. " +
+                "Expected ${T::class.java.simpleName} found ${view?.javaClass?.simpleName}"
+
+        assertNotNull(idNotFoundMessage, view)
+        assertTrue(wrongClassMessage, view is T)
+
+        return view as T
     }
 }

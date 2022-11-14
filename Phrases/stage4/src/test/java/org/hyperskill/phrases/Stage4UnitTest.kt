@@ -2,12 +2,11 @@ package org.hyperskill.phrases
 
 import android.app.Notification
 import android.os.SystemClock
+import android.widget.EditText
 import android.widget.TextView
-import org.hyperskill.phrases.data.room.AppDatabase
 import org.hyperskill.phrases.internals.PhrasesUnitTest
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.FixMethodOrder
 import org.junit.Test
@@ -29,74 +28,129 @@ class Stage4UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java) {
         SystemClock.setCurrentTimeMillis(System.currentTimeMillis())
     }
 
-    @Test
-    fun test00_checkAppDatabase() {
-        testActivity {
-            val db = AppDatabase.getInstance(activity)
-            assertNotNull("Are you sure your AppDatabase has a getInstance() method?", db)
-        }
+    @After
+    fun tearDown() {
+        closeRoom()
     }
 
     @Test
-    fun test01_checkDAO() {
+    fun test00_checkRecyclerViewIsUsingDatabase() {
+
+        addToDatabase(fakePhrases)
+
         testActivity {
-            val dao = AppDatabase.getInstance(activity).getPhraseDao()
-            assertNotNull("Are you sure your AppDatabase has a getPhraseDao() method?", dao)
-        }
-
-    }
-
-    @Before
-    fun setDB(){
-        addToRoomDatabase(1)
-    }
-
-    @Test
-    fun test02_checkRecyclerViewIsUsingDatabase() {
-        testActivity {
-            val dao = AppDatabase.getInstance(activity).getPhraseDao()
-            val phrases = dao.getAll()
-            recyclerView.assertSingleListItem(0) { itemViewSupplier ->
+            recyclerView.assertListItems(fakePhrases) { itemViewSupplier, index, phrase ->
                 val itemView = itemViewSupplier()
                 val phraseTextView = itemView.findViewByString<TextView>("phraseTextView")
-                val phrase = phrases[0]
+                val actualPhrase = phraseTextView.text.toString()
+
                 assertEquals(
-                    "The phrase[0] from database doesn't seem to match the one in the RecyclerView.",
-                    phrase.phrase,
-                    phraseTextView.text.toString()
+                    "The recyclerView is not matching database content",
+                    phrase,
+                    actualPhrase
                 )
             }
         }
     }
 
     @Test
-    fun test03_checkAddDialog() {
+    fun test01_checkRecyclerViewIsUsingDatabase2() {
+
+        val phrases = fakePhrases + "one more test phrase"
+        addToDatabase(phrases)
+
+        testActivity {
+            recyclerView.assertListItems(phrases) { itemViewSupplier, index, phrase ->
+                val itemView = itemViewSupplier()
+                val phraseTextView = itemView.findViewByString<TextView>("phraseTextView")
+                val actualPhrase = phraseTextView.text.toString()
+
+                assertEquals(
+                    "The recyclerView is not matching database content",
+                    phrase,
+                    actualPhrase
+                )
+            }
+        }
+    }
+
+    @Test
+    fun test02_checkAddDialog() {
+        val phrases = listOf("A text for test")
+
         testActivity {
             floatingButton.clickAndRun()
             val dialog = ShadowDialog.getLatestDialog()
             val shadowDialog = shadowOf(dialog)
             assertNotNull("Are you sure you are showing a dialog when the floating button is clicked?", dialog)
-            // TODO click on editText and type something
 
+            val editText = dialog.findViewByString<EditText>("editText")
+
+            editText.setText(phrases[0])
+            shadowDialog.clickOn(android.R.id.button1) // ok button
+            shadowLooper.idleFor(500, TimeUnit.MILLISECONDS)
+
+            val phrasesOnDatabase = readAllFromDatabase()
+
+            assertEquals("Database content should contain added phrase", phrases, phrasesOnDatabase)
+
+            recyclerView.assertListItems(phrases) { itemViewSupplier, index, phrase ->
+                val itemView = itemViewSupplier()
+                val phraseTextView = itemView.findViewByString<TextView>("phraseTextView")
+                val actualPhrase = phraseTextView.text.toString()
+
+                assertEquals(
+                    "The recyclerView is not matching database content",
+                    phrase,
+                    actualPhrase
+                )
+            }
         }
     }
 
+
+
     @Test
-    fun test04_checkPhrasesAreDeleted() {
+    fun test03_checkPhrasesAreDeleted() {
+
+        addToDatabase(fakePhrases)
+
         testActivity {
-            val dao = AppDatabase.getInstance(activity).getPhraseDao()
-            val phrases = dao.getAll()
             recyclerView.assertSingleListItem(0) { itemViewSupplier ->
                 val itemView = itemViewSupplier()
                 val deleteTextView = itemView.findViewByString<TextView>("deleteTextView")
                 deleteTextView.clickAndRun()
             }
-            assertEquals("The phrase was not deleted from the database.", phrases.size - 1, dao.getAll().size)
+
+            val phrasesOnDb = readAllFromDatabase()
+            val expectedSizeAfterDelete = fakePhrases.size - 1
+            val actualSizeAfterDelete = phrasesOnDb.size
+
+            assertEquals(
+                "The number of phrases on database should decrease after deleting phrase",
+                expectedSizeAfterDelete,
+                actualSizeAfterDelete
+            )
+
+            recyclerView.assertListItems(fakePhrases.slice(1..fakePhrases.lastIndex)) { itemViewSupplier, index, phrase ->
+                val itemView = itemViewSupplier()
+                val phraseTextView = itemView.findViewByString<TextView>("phraseTextView")
+                val actualPhrase = phraseTextView.text.toString()
+
+                assertEquals(
+                    "The recyclerView is not matching database content",
+                    phrase,
+                    actualPhrase
+                )
+            }
         }
     }
 
     @Test
-    fun test05_checkNotificationContainsPhraseFromDb() {
+    fun test04_checkNotificationContainsPhraseFromDb() {
+
+        addToDatabase(fakePhrases)
+
         testActivity {
             val minutesToAdd = 10
             val calendar = Calendar.getInstance()
@@ -119,17 +173,9 @@ class Stage4UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java) {
             assertNotNull(messageNotificationId, notification)
             notification!!
 
-            val messageContent = "The phrase in the notification doesn't match the one in the database."
+            val messageContent = "The phrase in the notification doesn't any one in the database."
             val actualContent = notification.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
-            assertEquals(messageContent, actualContent, AppDatabase.getInstance(activity).getPhraseDao().getAll()[0].phrase)
-
-            notification.contentIntent
+            assertTrue(messageContent, actualContent in fakePhrases)
         }
     }
-
-    @After
-    fun cleanUp() {
-        killRoomInstance()
-    }
-
 }
