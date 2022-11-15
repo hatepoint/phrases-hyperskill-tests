@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
-import org.hyperskill.phrases.ui.CHANNEL_ID
-import org.hyperskill.phrases.ui.NOTIFICATION_ID
 
 
 class Notification : BroadcastReceiver() {

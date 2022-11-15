@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity(), OnTimeSetListener {
         setContentView(binding.root)
         repository = PhrasesRepository(application)
         viewModel = ViewModelProvider(this, MainViewHolderFactory(application, repository)).get(MainViewModel::class.java)
+        viewModel.createNotificationChannel()
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         //TODO: Check if alarm is already up and set the textView accordingly
         viewModel.phrasesList.observe(this) { phrases ->

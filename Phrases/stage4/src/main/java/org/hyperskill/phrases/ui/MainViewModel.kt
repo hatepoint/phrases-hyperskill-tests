@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import org.hyperskill.phrases.CHANNEL_ID
+import org.hyperskill.phrases.NOTIFICATION_ID
 import org.hyperskill.phrases.Notification
 import org.hyperskill.phrases.R
 import org.hyperskill.phrases.data.PhrasesRepository
@@ -74,7 +76,7 @@ class MainViewModel(val application: Application, val repository: PhrasesReposit
 
         val pendingIntent = PendingIntent.getBroadcast(application.applicationContext, NOTIFICATION_ID, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         alarmManager = application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, 86400 * 1000, pendingIntent)
         Log.d("Notification", "Notification scheduled at $hour:$minute")
     }
 
