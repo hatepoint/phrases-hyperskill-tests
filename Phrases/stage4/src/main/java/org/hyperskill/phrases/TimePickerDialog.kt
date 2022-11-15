@@ -9,6 +9,6 @@ class TimePickerDialog : DialogFragment() {
     private val defaultHour = 9
     private val defaultMinute = 0
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return android.app.TimePickerDialog(activity, activity as android.app.TimePickerDialog.OnTimeSetListener, defaultHour, defaultMinute, is24HourFormat(activity))
+        return android.app.TimePickerDialog(activity, activity as android.app.TimePickerDialog.OnTimeSetListener, defaultHour, defaultMinute, true)
     }
 }
