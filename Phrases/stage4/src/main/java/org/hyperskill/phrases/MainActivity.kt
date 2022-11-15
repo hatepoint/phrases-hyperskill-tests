@@ -57,6 +57,6 @@ class MainActivity : AppCompatActivity(), OnTimeSetListener {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onTimeSet(view: TimePicker?, hour: Int, minute: Int) {
         viewModel.scheduleNotification(hour, minute)
-        binding.reminderTextView.text = "Reminder set for $hour:$minute"
+        binding.reminderTextView.text = "Reminder set for %02d:%02d".format(hour, minute)
     }
 }

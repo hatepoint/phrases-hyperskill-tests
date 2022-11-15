@@ -178,4 +178,27 @@ class Stage4UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java) {
             assertTrue(messageContent, actualContent in fakePhrases)
         }
     }
+
+    @Test
+    fun test05_checkTimeFormatting() {
+        addToDatabase(fakePhrases)
+
+        testActivity {
+            val minutesToAdd = 10
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.MINUTE, minutesToAdd)
+            val pickHour = 9
+            val pickMinute = 5
+
+            reminderTv.clickAndRun()
+            val timePickerDialog = getLatestTimePickerDialog()
+
+            timePickerDialog.pickTime(pickHour, pickMinute)
+            shadowLooper.idleFor(minutesToAdd + 2L, TimeUnit.MINUTES) // trigger alarm
+
+            val expectedText = "Reminder set for 09:05"
+            val actualText = reminderTv.text.toString()
+            assertEquals("Time is not formatted correctly", expectedText, actualText)
+        }
+    }
 }
