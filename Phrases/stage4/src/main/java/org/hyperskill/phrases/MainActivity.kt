@@ -3,6 +3,7 @@ package org.hyperskill.phrases
 import android.app.TimePickerDialog.OnTimeSetListener
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.TimePicker
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -56,7 +57,8 @@ class MainActivity : AppCompatActivity(), OnTimeSetListener {
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onTimeSet(view: TimePicker?, hour: Int, minute: Int) {
-        viewModel.scheduleNotification(hour, minute)
-        binding.reminderTextView.text = "Reminder set for %02d:%02d".format(hour, minute)
+        if (viewModel.scheduleNotification(hour, minute)) {
+            binding.reminderTextView.text = "Reminder set for %02d:%02d".format(hour, minute)
+        }
     }
 }

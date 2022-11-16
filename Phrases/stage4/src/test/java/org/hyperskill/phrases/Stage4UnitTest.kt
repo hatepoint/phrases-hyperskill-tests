@@ -15,6 +15,7 @@ import org.junit.runners.MethodSorters
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.shadows.ShadowDialog
+import org.robolectric.shadows.ShadowToast
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -199,6 +200,41 @@ class Stage4UnitTest : PhrasesUnitTest<MainActivity>(MainActivity::class.java) {
             val expectedText = "Reminder set for 09:05"
             val actualText = reminderTv.text.toString()
             assertEquals("Time is not formatted correctly", expectedText, actualText)
+        }
+    }
+
+    @Test
+    fun test06_checkRemindersNotAllowedWithEmptyDatabase() {
+        addToDatabase(fakePhrases)
+
+        testActivity {
+
+            for (i in 1..3) {
+                recyclerView.assertSingleListItem(0) { itemViewSupplier ->
+                    val itemView = itemViewSupplier()
+                    val deleteTextView = itemView.findViewByString<TextView>("deleteTextView")
+                    deleteTextView.clickAndRun()
+                }
+            }
+
+            val minutesToAdd = 10
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.MINUTE, minutesToAdd)
+            val pickHour = 9
+            val pickMinute = 5
+
+            reminderTv.clickAndRun()
+            val timePickerDialog = getLatestTimePickerDialog()
+
+            timePickerDialog.pickTime(pickHour, pickMinute)
+            shadowLooper.idleFor(minutesToAdd + 2L, TimeUnit.MINUTES) // trigger alarm
+
+            val toast = ShadowToast.getLatestToast()
+            assertNotNull("Toast is not shown after trying to set reminder with empty database", toast)
+
+            val expectedText = "No reminder set"
+            val actualText = reminderTv.text.toString()
+            assertEquals("Seems like reminder is still set with empty database", expectedText, actualText)
         }
     }
 }

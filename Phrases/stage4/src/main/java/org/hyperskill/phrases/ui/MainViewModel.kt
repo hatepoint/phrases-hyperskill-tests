@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
@@ -65,19 +66,26 @@ class MainViewModel(val application: Application, val repository: PhrasesReposit
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun scheduleNotification(hour: Int, minute: Int) {
+    fun scheduleNotification(hour: Int, minute: Int) : Boolean {
         val calendar = Calendar.getInstance()
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), hour, minute, 0)
         val intent = Intent(application, Notification::class.java)
         val title = "Your phrase of the day"
-        val message = phrasesList.value?.random()?.phrase
-        intent.putExtra("titleExtra", title)
-        intent.putExtra("messageExtra", message)
+        if (phrasesList.value?.isNotEmpty() == true) {
+            val message = phrasesList.value?.random()?.phrase
+            intent.putExtra("titleExtra", title)
+            intent.putExtra("messageExtra", message)
 
-        val pendingIntent = PendingIntent.getBroadcast(application.applicationContext, NOTIFICATION_ID, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        alarmManager = application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, 86400 * 1000, pendingIntent)
-        Log.d("Notification", "Notification scheduled at $hour:$minute")
+
+            val pendingIntent = PendingIntent.getBroadcast(application.applicationContext, NOTIFICATION_ID, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+            alarmManager = application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, 86400 * 1000, pendingIntent)
+            Log.d("Notification", "Notification scheduled at $hour:$minute")
+            return true
+        } else {
+            Toast.makeText(application, "You have no phrases to schedule", Toast.LENGTH_SHORT).show()
+            return false
+        }
     }
 
 }
