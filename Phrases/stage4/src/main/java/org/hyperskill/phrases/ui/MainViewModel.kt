@@ -80,6 +80,7 @@ class MainViewModel(val application: Application, val repository: PhrasesReposit
             val pendingIntent = PendingIntent.getBroadcast(application.applicationContext, NOTIFICATION_ID, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
             alarmManager = application.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, 86400 * 1000, pendingIntent)
+//            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
             Log.d("Notification", "Notification scheduled at $hour:$minute")
             return true
         } else {

@@ -119,7 +119,10 @@ open class PhrasesUnitTest<T : Activity>(clazz: Class<T>): AbstractUnitTest<T>(c
     fun supportForAlarmManager() {
         val alarmManager = activity.getSystemService<AlarmManager>()
         val shadowAlarmManager: ShadowAlarmManager = shadowOf(alarmManager)
-        shadowAlarmManager.scheduledAlarms.lastOrNull()?.also {
+        val toTrigger = shadowAlarmManager.scheduledAlarms.filter {
+            it.triggerAtTime < SystemClock.currentGnssTimeClock().millis()
+        }
+        toTrigger.forEach {
             if(it.operation != null) {
                 val pendingIntent = Shadows.shadowOf(it.operation)
                 if(it.triggerAtTime < SystemClock.currentGnssTimeClock().millis()) {
@@ -137,6 +140,7 @@ open class PhrasesUnitTest<T : Activity>(clazz: Class<T>): AbstractUnitTest<T>(c
                     it.onAlarmListener.onAlarm()
                 }
             }
+            shadowAlarmManager.scheduledAlarms.remove(it)
         }
     }
 
