@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion hs.android.compileSdkVersion
@@ -11,6 +12,11 @@ android {
         targetSdkVersion hs.android.targetSdkVersion
         versionCode 1
         versionName '1.0'
+        kapt {
+            arguments {
+                arg("room.schemaLocation", "$projectDir/schemas")
+            }
+        }
     }
 
     buildFeatures {
@@ -33,4 +39,14 @@ dependencies {
 
     def material = hs.android.lib.material
     implementation "com.google.android.material:material:$material"
+
+    def roomVersion = '2.3.0'
+    kapt "androidx.room:room-compiler:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
+    implementation "androidx.room:room-runtime:$roomVersion"
+
+    def lifecycleVersion = '2.2.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
+
 }
