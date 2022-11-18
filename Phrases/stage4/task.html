@@ -1,0 +1,31 @@
+<html>
+<h2>Description&nbsp;</h2>
+
+<p>To have more than some predefined spaces, we need to keep them somewhere. In this stage, we will try to store our phrases in database using Room.</p>
+
+<h2>Objectives</h2>
+
+<ol>
+    <li>Create an Entity named Phrase for your phrases with <code>id</code>&nbsp;and <code>phrase</code> as a properties.</li>
+    <li>Create a class named AppDatabase based on <code>RoomDatabase</code>.&nbsp; AppDatabse should have a getInstance() and getPhraseDao() methods.</li>
+    <li>Create a <code>DAO</code> object named PhraseDao, and define methods to <code>insert</code>, <code>delete</code>, <code>get</code>, and <code>getAll</code> phrases from your database.</li>
+    <li>Update your previous code so that your <code>RecyclerView</code> shows the phrases from the database.</li>
+    <li>Implement a <code>DialogFragment</code> that shows when you click the <code>addButton</code> and allows you to insert more phrases in the database.</li>
+    <li>Don&#39;t forget to update your <code>RecyclerView</code>: new phrases should pop up immediately!</li>
+    <li>Update your previous code so that &quot;Delete&quot; <code>TextView</code> deletes the phrase from the screen and database.</li>
+    <li>Update your previous code so that your notifications take phrases from the database and not from that old list you&#39;ve used previously.&nbsp;</li>
+    <li>Make sure the time formatting for the <code>reminderTv</code> is done properly (Example: 01:01, 11:00, etc.) Use 24-hour format.</li>
+    <li>Make sure you cannot set&nbsp;reminders with empty database. If user tries to set a reminder with no phrases available, show Toast with an error message and set reminderTv.text to &quot;No reminder set&quot;.</li>
+</ol>
+
+<h2>Examples</h2>
+
+<p><strong>Example 1:</strong> <em>An example of your program after clicking the addButton</em></p>
+
+<p><img alt="" height="923" name="Screenshot_1666648863.png" src="https://ucarecdn.com/3c481e25-1191-47bb-871c-882e70fdb689/" width="426" /></p>
+
+<p><strong>Example 2:</strong> <em>An example of your program after adding a new phrase</em></p>
+
+<p><img alt="" height="928" name="Screenshot_1666649188.png" src="https://ucarecdn.com/8b08fc50-72a0-4051-9c81-63b852b5cbed/" width="428" /></p>
+
+</html>
